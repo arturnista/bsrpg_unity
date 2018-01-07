@@ -52,7 +52,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61a3abccee879430bb7641c2858b3b89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Size: 30
+  m_MaximumDist: 5
+  m_TracePercShow: 0.5
+  m_Size: 50
 --- !u!120 &120793929329380914
 LineRenderer:
   m_ObjectHideFlags: 1

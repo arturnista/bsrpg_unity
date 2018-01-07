@@ -11,13 +11,14 @@ public class BoomerangBehaviour : MonoBehaviour {
 	[SerializeField]
 	private float m_MaximumDist = 5f;
 
-	private float m_SpriteAngle;
+	[SerializeField]
+	private float m_Speed = 5f;
 
-	private float m_DistanceTraveled;
-	private float m_Distance;
+	private float m_SpriteAngle;
 
 	private bool m_EaseCurve;
 
+	/* FLY CIRCLE VARIABLES */
 	private Vector3 m_FinalPosition;
 	private Vector3 m_InitialPosition;
 	private Vector3 m_CenterPosition;
@@ -28,11 +29,13 @@ public class BoomerangBehaviour : MonoBehaviour {
 	private float m_StartTime;
 	private float m_Duration;
 
+	/* FLY STRAIGHT VARIABLES */
 	private Vector3 m_Direction;
 
 	enum Status {
 		None,
-		Flying,
+		FlyingCircle,
+		FlyingStraight,
 		Stopped
 	}
 	private Status m_Status;
@@ -45,10 +48,15 @@ public class BoomerangBehaviour : MonoBehaviour {
 		m_Status = Status.None;
 	}
 
-	public void Throw(Vector3 initial, Vector3 final, bool ease) {
-		m_Status = Status.Flying;
-
+	public void StraightThrow(Vector3 initial, Vector3 final) {
 		m_Direction = Vector3.Normalize(final - initial);
+		transform.position = initial + (m_Direction * 2.1f);
+		m_Rigidbody.velocity = m_Direction * m_Speed;
+
+		m_Status = Status.FlyingStraight;
+	}
+
+	public void Throw(Vector3 initial, Vector3 final, bool ease) {
 		m_StartTime = Time.time;
 
 		m_InitialPosition = initial;
@@ -77,10 +85,12 @@ public class BoomerangBehaviour : MonoBehaviour {
 		transform.position = newPosition;
 
 		m_EaseCurve = ease;
+		m_Status = Status.FlyingCircle;
 	}
 
 	void Update () {
-		if(m_Status != Status.Flying) {
+		if(m_Status == Status.None) return;
+		if(m_Status == Status.Stopped) {
 			m_Rigidbody.velocity = Vector3.zero;
 			return;
 		}
@@ -88,6 +98,14 @@ public class BoomerangBehaviour : MonoBehaviour {
 		m_SpriteAngle = (m_SpriteAngle + (500f * Time.deltaTime)) % 360;
 		m_Sprite.eulerAngles = new Vector3(0f, 0f, m_SpriteAngle);
 
+		if(m_Status == Status.FlyingCircle) {
+			FlyCircle();
+		} else if(m_Status == Status.FlyingStraight) {
+			FlyStraight();			
+		}
+	}
+
+	void FlyCircle() {
 		float time = (Time.time - m_StartTime) / m_Duration;
 		Vector3 newPosition = transform.position;
 
@@ -109,6 +127,10 @@ public class BoomerangBehaviour : MonoBehaviour {
 		}
 
 		transform.position = newPosition;
+	}
+
+	void FlyStraight() {
+
 	}
 
 	void OnTriggerEnter2D(Collider2D coll) {

@@ -7,29 +7,34 @@ public class Door : Interactable {
 	private Transform m_Handler;
 	[Range(1, 10)]
 	public int amountNecessary = 1;
+	public Interactable.Status initialStatus;
 
 	private int m_Amount;
 
 	void Awake () {
 		m_Handler = transform.Find("Door");
 		m_Amount = 0;
-		m_Status = Interactable.Status.Deactivated;
+		if(initialStatus == Interactable.Status.Deactivated) {
+			Deactivate(true);
+		} else {
+			Activate(true);
+		}
 	}
 	
 	void Update () {
 		
 	}
 
-	public override void Activate() {
+	public override void Activate(bool force = false) {
 		m_Status = Interactable.Status.Activated;
-		if(++m_Amount >= amountNecessary) {
+		if(force || ++m_Amount >= amountNecessary) {
 			m_Handler.gameObject.SetActive(false);
 		}
 	}
 
-	public override void Deactivate() {
+	public override void Deactivate(bool force = false) {
 		m_Status = Interactable.Status.Deactivated;
 		m_Handler.gameObject.SetActive(true);	
-		m_Amount--;
+		if(!force) m_Amount--;
 	}
 }

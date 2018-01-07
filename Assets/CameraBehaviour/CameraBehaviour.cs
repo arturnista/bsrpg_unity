@@ -5,6 +5,8 @@ using UnityEngine;
 public class CameraBehaviour : MonoBehaviour {
 
 	private Camera m_Camera;
+	private Player m_Player;
+
 	private Vector3 m_Focus;
 	private float m_Size;
 
@@ -16,12 +18,16 @@ public class CameraBehaviour : MonoBehaviour {
 
 	void Awake () {
 		m_Camera = GetComponent<Camera>();
+
+		m_Player = GameObject.FindObjectOfType<Player>();
+		
 		m_OriginalSize = m_Camera.orthographicSize;
-		m_OriginalPosition = Vector3.zero;
-		m_OriginalPosition.z = -10f;
 	}
 	
 	void Update () {
+		m_OriginalPosition = m_Player.transform.position;
+		m_OriginalPosition.z = -10f;
+
 		float time = (Time.time - m_StartTime) / m_Duration;
 		if(time < 1) {
 			transform.position = Vector3.Lerp(m_Focus, m_OriginalPosition, time);

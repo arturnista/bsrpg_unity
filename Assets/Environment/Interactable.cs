@@ -10,11 +10,11 @@ public class Interactable : MonoBehaviour {
 	}
 	protected Interactable.Status m_Status;
 
-	public virtual void Activate() {
+	public virtual void Activate(bool force = false) {
 
 	}
 
-	public virtual void Deactivate() {
+	public virtual void Deactivate(bool force = false) {
 		
 	}
 }

@@ -7,6 +7,13 @@ public class TraceDisplay : MonoBehaviour {
 	private LineRenderer m_Line;
 	private Player m_Player;	
 
+	public enum Pattern {
+		None,
+		FlyingCircle,
+		FlyingStraight,
+	}
+	private Pattern m_Pattern;
+
 	[SerializeField]
 	private float m_MaximumDist = 5f;
 	[SerializeField]
@@ -32,6 +39,17 @@ public class TraceDisplay : MonoBehaviour {
 	}
 	
 	void Update () {
+		if(m_Pattern == Pattern.FlyingCircle) {
+			CirclePattern();
+		} else if(m_Pattern == Pattern.FlyingStraight) {
+			StraightPattern();			
+		} else {
+			m_Line.positionCount = 0;
+		}
+	}
+
+	void CirclePattern() {
+
 		m_InitialPosition = m_Player.transform.position;
 		Vector3 fin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -67,6 +85,24 @@ public class TraceDisplay : MonoBehaviour {
 
 		m_Line.positionCount = m_Size;
 		m_Line.SetPositions(m_Positions);
+	}
+
+	void StraightPattern() {
+		m_InitialPosition = m_Player.transform.position;
+		m_FinalPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+		m_InitialPosition.z = 0f;
+		m_FinalPosition.z = 0f;
+		
+		m_Positions[0] = m_InitialPosition;
+		m_Positions[1] = m_FinalPosition;
+		
+		m_Line.positionCount = 2;
+		m_Line.SetPositions(m_Positions);
+	}
+
+	public void SetPattern(Pattern p) {
+		m_Pattern = p;
 	}
 
 }

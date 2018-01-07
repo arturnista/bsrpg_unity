@@ -23,7 +23,7 @@ public class Player : MonoBehaviour {
 		m_Rigidbody = GetComponent<Rigidbody2D>();
 		
 		m_TraceDisplay = GameObject.FindObjectOfType<TraceDisplay>();
-		m_TraceDisplay.gameObject.SetActive(false);
+		m_TraceDisplay.SetPattern(TraceDisplay.Pattern.None);
 		
 		m_HasBoomerang = true;
 	}
@@ -46,19 +46,36 @@ public class Player : MonoBehaviour {
 		transform.localEulerAngles = new Vector3(0, 0, angle);
 
 		if(Input.GetMouseButtonDown(0)) {
-			m_TraceDisplay.gameObject.SetActive(true);
+			m_TraceDisplay.SetPattern(TraceDisplay.Pattern.FlyingCircle);
 		}
 		if(Input.GetMouseButtonUp(0)) {
-			this.Throw(lookingDirection);
-			m_TraceDisplay.gameObject.SetActive(false);
+			this.Throw();
+		m_TraceDisplay.SetPattern(TraceDisplay.Pattern.None);
+		}
+
+		if(Input.GetMouseButtonDown(1)) {
+			m_TraceDisplay.SetPattern(TraceDisplay.Pattern.FlyingStraight);
+		}
+		if(Input.GetMouseButtonUp(1)) {
+			this.StraightThrow();
+		m_TraceDisplay.SetPattern(TraceDisplay.Pattern.None);
 		}
 	}
 
-	void Throw(Vector3 lookingDirection) {
+	void Throw() {
 		if(!m_HasBoomerang) return;
 
 		BoomerangBehaviour boom = Instantiate(boomerangBrefab, transform.position, Quaternion.identity).GetComponent<BoomerangBehaviour>();
 		boom.Throw(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition), easeBoomerangCurve);
+		
+		m_HasBoomerang = false;
+	}
+
+	void StraightThrow() {
+		if(!m_HasBoomerang) return;
+
+		BoomerangBehaviour boom = Instantiate(boomerangBrefab, transform.position, Quaternion.identity).GetComponent<BoomerangBehaviour>();
+		boom.StraightThrow(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
 		
 		m_HasBoomerang = false;
 	}
