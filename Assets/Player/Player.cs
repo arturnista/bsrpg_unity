@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
 	public GameObject boomerangBrefab;
+	public bool easeBoomerangCurve;
 
 	[SerializeField]
 	private float m_MoveSpeed = 40f;
@@ -13,12 +14,17 @@ public class Player : MonoBehaviour {
 	
 	private bool m_HasBoomerang;
 	
+	private TraceDisplay m_TraceDisplay;
 	private Rigidbody2D m_Rigidbody;
 
 	private float m_Life;
 
 	void Awake () {
 		m_Rigidbody = GetComponent<Rigidbody2D>();
+		
+		m_TraceDisplay = GameObject.FindObjectOfType<TraceDisplay>();
+		m_TraceDisplay.gameObject.SetActive(false);
+		
 		m_HasBoomerang = true;
 	}
 
@@ -40,16 +46,19 @@ public class Player : MonoBehaviour {
 		transform.localEulerAngles = new Vector3(0, 0, angle);
 
 		if(Input.GetMouseButtonDown(0)) {
+			m_TraceDisplay.gameObject.SetActive(true);
+		}
+		if(Input.GetMouseButtonUp(0)) {
 			this.Throw(lookingDirection);
+			m_TraceDisplay.gameObject.SetActive(false);
 		}
 	}
 
 	void Throw(Vector3 lookingDirection) {
 		if(!m_HasBoomerang) return;
 
-		Vector3 boomPos = (lookingDirection * 3f) + transform.position;
-		BoomerangBehaviour boom = Instantiate(boomerangBrefab, boomPos, Quaternion.identity).GetComponent<BoomerangBehaviour>();
-		boom.Throw(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
+		BoomerangBehaviour boom = Instantiate(boomerangBrefab, transform.position, Quaternion.identity).GetComponent<BoomerangBehaviour>();
+		boom.Throw(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition), easeBoomerangCurve);
 		
 		m_HasBoomerang = false;
 	}
