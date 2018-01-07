@@ -8,6 +8,9 @@ public class BoomerangBehaviour : MonoBehaviour {
 	private Transform m_Sprite;	
 	private Player m_Player;	
 
+	[SerializeField]
+	private float m_MaximumDist = 5f;
+
 	private float m_SpriteAngle;
 
 	private float m_DistanceTraveled;
@@ -49,7 +52,11 @@ public class BoomerangBehaviour : MonoBehaviour {
 		m_StartTime = Time.time;
 
 		m_InitialPosition = initial;
-		m_FinalPosition = final;
+		m_InitialPosition.z = 0f;
+		final.z = 0f;
+
+		m_FinalPosition = Vector2.Distance(m_InitialPosition, final) > m_MaximumDist ? 
+			(m_InitialPosition + Vector3.Normalize(final - m_InitialPosition) * m_MaximumDist) : final;
 
 		m_InitialPosition.z = 0f;
 		m_FinalPosition.z = 0f;
@@ -78,7 +85,7 @@ public class BoomerangBehaviour : MonoBehaviour {
 			return;
 		}
 
-		m_SpriteAngle = (m_SpriteAngle + 10f) % 360;
+		m_SpriteAngle = (m_SpriteAngle + (500f * Time.deltaTime)) % 360;
 		m_Sprite.eulerAngles = new Vector3(0f, 0f, m_SpriteAngle);
 
 		float time = (Time.time - m_StartTime) / m_Duration;

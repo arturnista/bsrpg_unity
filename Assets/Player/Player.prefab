@@ -120,6 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boomerangBrefab: {fileID: 1811898533195616, guid: 72c26838afec943eba9f2717192c0080,
     type: 2}
+  easeBoomerangCurve: 0
   m_MoveSpeed: 10
   m_MaximumLife: 100
 --- !u!212 &212900855537085892

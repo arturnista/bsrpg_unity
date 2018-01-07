@@ -65,8 +65,8 @@ public class Button : MonoBehaviour {
 
 	public void Activate(bool interactable = true) {
 		if(interactable && m_Status != Interactable.Status.Activated) {
-			m_TimeController.SlowTime(0, .3f);
-			m_CameraBehaviour.Focus(transform.position, .3f);
+			m_TimeController.SlowTime(0.2f, .3f);
+			// m_CameraBehaviour.Focus(transform.position, .3f);
 			m_Interactable.Activate();		
 		}
 		

@@ -5,7 +5,13 @@ using UnityEngine;
 public class TraceDisplay : MonoBehaviour {
 
 	private LineRenderer m_Line;
-	private Player m_Player;
+	private Player m_Player;	
+
+	[SerializeField]
+	private float m_MaximumDist = 5f;
+	[SerializeField]
+	[Range(0f, 1f)]
+	private float m_TracePercShow = .4f;
 
 	public int m_Size = 60;
 	Vector3[] m_Positions;
@@ -22,18 +28,21 @@ public class TraceDisplay : MonoBehaviour {
 		m_Player = GameObject.FindObjectOfType<Player>();
 		m_Line = GetComponent<LineRenderer>();
 		m_Positions = new Vector3[m_Size];
-		m_FullSize = Mathf.FloorToInt(m_Size * 2.5f);
+		m_FullSize = Mathf.FloorToInt(m_Size * (1 / m_TracePercShow));
 	}
 	
 	void Update () {
 		m_InitialPosition = m_Player.transform.position;
-		m_FinalPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector3 fin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
 		m_InitialPosition.z = 0f;
-		m_FinalPosition.z = 0f;
+		fin.z = 0f;
+
+		m_FinalPosition = Vector2.Distance(m_InitialPosition, fin) > m_MaximumDist ? 
+			(m_InitialPosition + Vector3.Normalize(fin - m_InitialPosition) * m_MaximumDist) : fin;
 
 		Vector3 m_DiffPos = (m_FinalPosition - m_InitialPosition);
-		m_CenterPosition = (m_FinalPosition - m_InitialPosition) * 0.5f;
+		m_CenterPosition = m_DiffPos * 0.5f;
 		m_Range = m_CenterPosition.magnitude;
 
 		m_InitialAngle = Mathf.Atan2(m_DiffPos.normalized.y, m_DiffPos.normalized.x) * Mathf.Rad2Deg;
