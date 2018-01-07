@@ -6,6 +6,7 @@ public class BoomerangBehaviour : MonoBehaviour {
 
 	private Rigidbody2D m_Rigidbody;
 	private Transform m_Sprite;	
+	private Player m_Player;	
 
 	private float m_SpriteAngle;
 
@@ -35,6 +36,7 @@ public class BoomerangBehaviour : MonoBehaviour {
 
 	void Awake () {
 		m_Rigidbody = GetComponent<Rigidbody2D>();
+		m_Player = GameObject.FindObjectOfType<Player>();
 		m_Sprite = transform.Find("Sprite");
 		m_SpriteAngle = 0f;
 		m_Status = Status.None;
@@ -71,24 +73,33 @@ public class BoomerangBehaviour : MonoBehaviour {
 	}
 
 	void Update () {
-		if(m_Status != Status.Flying) return;
+		if(m_Status != Status.Flying) {
+			m_Rigidbody.velocity = Vector3.zero;
+			return;
+		}
 
 		m_SpriteAngle = (m_SpriteAngle + 10f) % 360;
 		m_Sprite.eulerAngles = new Vector3(0f, 0f, m_SpriteAngle);
 
 		float time = (Time.time - m_StartTime) / m_Duration;
-		float angle = Mathf.Deg2Rad * (Mathf.Lerp(m_InitialAngle, 360f, time) - m_AngleOffset);
+		Vector3 newPosition = transform.position;
 
-		Vector3 dir = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle));
+		if(time > .9f) {
+			Vector3 dir = Vector3.Normalize(m_Player.transform.position - transform.position);
+			m_Rigidbody.velocity = dir * ( (2f * Mathf.PI * m_Range) / m_Duration );
+		} else {
+			float angle = Mathf.Deg2Rad * (Mathf.Lerp(m_InitialAngle, 360f, time) - m_AngleOffset);
 
-		if(m_EaseCurve) {
-			float dTime = time * 2;
-			float relTime = time >= .5 ? 2 - dTime : dTime;
-			float fTime = relTime >= .5 ? relTime : 1 - relTime;
-			dir *= fTime;
+			Vector3 dir = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle));
+
+			if(m_EaseCurve) {
+				float dTime = time * 2;
+				float relTime = time >= .5 ? 2 - dTime : dTime;
+				float fTime = relTime >= .5 ? relTime : 1 - relTime;
+				dir *= fTime;
+			}
+			newPosition = m_CenterPosition + m_InitialPosition + ( dir * m_Range );
 		}
-
-		Vector3 newPosition = m_CenterPosition + m_InitialPosition + ( dir * m_Range );
 
 		transform.position = newPosition;
 	}

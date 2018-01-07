@@ -16,6 +16,8 @@ public class Button : MonoBehaviour {
 	[SerializeField]
 	private Interactable.Status m_InitialStatus = Interactable.Status.Deactivated;
 	
+	private TimeController m_TimeController;
+	private CameraBehaviour m_CameraBehaviour;
 	private Interactable m_Interactable;
 	private SpriteRenderer m_Sprite;
 	
@@ -29,6 +31,9 @@ public class Button : MonoBehaviour {
 		m_Interactable = goInteractable.GetComponent<Interactable>();
 		m_Sprite = GetComponentInChildren<SpriteRenderer>();
 		
+		m_TimeController = GameObject.FindObjectOfType<TimeController>();
+		m_CameraBehaviour = GameObject.FindObjectOfType<CameraBehaviour>();
+
 		if(m_InitialStatus == Interactable.Status.Deactivated) {
 			this.Deactivate(false);
 		} else {
@@ -59,7 +64,11 @@ public class Button : MonoBehaviour {
 	}
 
 	public void Activate(bool interactable = true) {
-		if(interactable && m_Status != Interactable.Status.Activated) m_Interactable.Activate();		
+		if(interactable && m_Status != Interactable.Status.Activated) {
+			m_TimeController.SlowTime(0, .3f);
+			m_CameraBehaviour.Focus(transform.position, .3f);
+			m_Interactable.Activate();		
+		}
 		
 		m_Sprite.color = Color.yellow;
 		m_Status = Interactable.Status.Activated;
