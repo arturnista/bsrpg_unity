@@ -27,8 +27,12 @@ public class Door : Interactable {
 
 	public override void Activate(bool force = false) {
 		m_Status = Interactable.Status.Activated;
-		if(force || ++m_Amount >= amountNecessary) {
-			m_Handler.gameObject.SetActive(false);
+		if(amountNecessary > 1) {
+			if(force || ++m_Amount >= amountNecessary) {
+				m_Handler.gameObject.SetActive(false);
+			}
+		} else {
+			m_Handler.gameObject.SetActive(false);			
 		}
 	}
 
