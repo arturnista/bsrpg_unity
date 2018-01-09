@@ -17,4 +17,8 @@ public class Interactable : MonoBehaviour {
 	public virtual void Deactivate(bool force = false) {
 		
 	}
+
+	public virtual void Toggle() {
+		
+	}
 }

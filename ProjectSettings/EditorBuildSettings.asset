@@ -16,4 +16,7 @@ EditorBuildSettings:
     guid: 21a2fb1cdf5f84a0d83971d6b4d32334
   - enabled: 1
     path: Assets/Level_04.unity
+    guid: 7d36edfb404aa4fa3a64c04af7a6aeac
+  - enabled: 1
+    path: Assets/Level_05.unity
     guid: 779ac3ad7abaa4acb88844a54838d56a

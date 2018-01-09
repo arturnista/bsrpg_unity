@@ -10,34 +10,29 @@ public class Button : MonoBehaviour {
 		Deactivate
 	}
 
-	public GameObject goInteractable;
-	public Action actionWhenUse = Action.Activate;
-	
+	[SerializeField]
+	private List<ButtonAct> m_Interactables;
 	[SerializeField]
 	private Interactable.Status m_InitialStatus = Interactable.Status.Deactivated;
+	[SerializeField]
+	private Action m_ActionWhenUse = Action.Activate;
 	
 	private TimeController m_TimeController;
 	private CameraBehaviour m_CameraBehaviour;
-	private Interactable m_Interactable;
 	private SpriteRenderer m_Sprite;
 	
 	private Interactable.Status m_Status;
 
 	void Awake () {
-		if(goInteractable == null) {
-			Debug.LogError("No goInteractable selected");
-		}
-
-		m_Interactable = goInteractable.GetComponent<Interactable>();
 		m_Sprite = GetComponentInChildren<SpriteRenderer>();
 		
 		m_TimeController = GameObject.FindObjectOfType<TimeController>();
 		m_CameraBehaviour = GameObject.FindObjectOfType<CameraBehaviour>();
 
 		if(m_InitialStatus == Interactable.Status.Deactivated) {
-			this.Deactivate(false);
+			this.Deactivate(true);
 		} else {
-			this.Activate(false);
+			this.Activate(true);
 		}
 	}
 	
@@ -48,12 +43,13 @@ public class Button : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D coll) {
 		BoomerangBehaviour boom = coll.GetComponent<BoomerangBehaviour>();
 		if(boom) {
-			switch (actionWhenUse) {
+			switch (m_ActionWhenUse)
+			{
 				case Action.Activate:
-					this.Activate();
+					if(m_Status != Interactable.Status.Activated) this.Activate();
 					break;
 				case Action.Deactivate:
-					this.Deactivate();
+					if(m_Status != Interactable.Status.Deactivated) this.Deactivate();
 					break;
 				case Action.Toggle:
 					if(m_Status == Interactable.Status.Deactivated) this.Activate();
@@ -63,20 +59,45 @@ public class Button : MonoBehaviour {
 		}
 	}
 
-	public void Activate(bool interactable = true) {
-		if(interactable && m_Status != Interactable.Status.Activated) {
-			m_TimeController.SlowTime(0.2f, .3f);
-			// m_CameraBehaviour.Focus(transform.position, .3f);
-			m_Interactable.Activate();		
+	public void Activate(bool isInitial = false) {
+		if(!isInitial) {
+			foreach (ButtonAct bAction in m_Interactables) {
+				switch (bAction.actionWhenUse) {
+					case Action.Activate:
+						if(bAction.interactable != null) bAction.interactable.Activate();		
+						break;
+					case Action.Deactivate:
+						if(bAction.interactable != null) bAction.interactable.Deactivate();		
+						break;
+					case Action.Toggle:
+						if(bAction.interactable != null) bAction.interactable.Toggle();		
+						break;
+				}
+			}
 		}
-		
+
+		m_TimeController.SlowTime(0.2f, .3f);
 		m_Sprite.color = Color.yellow;
 		m_Status = Interactable.Status.Activated;
 	}
 
-	public void Deactivate(bool interactable = true) {
-		if(interactable && m_Status != Interactable.Status.Deactivated) m_Interactable.Deactivate();		
-		
+	public void Deactivate(bool isInitial = false) {
+		if(!isInitial) {
+			foreach (ButtonAct bAction in m_Interactables) {
+				switch (bAction.actionWhenUse) {
+					case Action.Activate:
+						if(bAction.interactable != null) bAction.interactable.Deactivate();		
+						break;
+					case Action.Deactivate:
+						if(bAction.interactable != null) bAction.interactable.Activate();		
+						break;
+					case Action.Toggle:
+						if(bAction.interactable != null) bAction.interactable.Toggle();		
+						break;
+				}
+			}
+		}
+
 		m_Sprite.color = Color.white;
 		m_Status = Interactable.Status.Deactivated;
 	}

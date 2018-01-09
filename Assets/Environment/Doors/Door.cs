@@ -41,4 +41,9 @@ public class Door : Interactable {
 		m_Handler.gameObject.SetActive(true);	
 		if(!force) m_Amount--;
 	}
+
+	public override void Toggle() {
+		if(m_Status == Interactable.Status.Deactivated) this.Activate();
+		else this.Deactivate();
+	}
 }
